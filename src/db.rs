@@ -625,6 +625,15 @@ impl<T: ThreadMode> DBWithThreadMode<T> {
         Self::open_cf_descriptors_internal(opts, path, cfs, &AccessType::ReadWrite)
     }
 
+    pub fn open_from_outside(path: String, db: *mut ffi::rocksdb_t, cfs: BTreeMap<String, *mut ffi::rocksdb_column_family_handle_t>) -> Self {
+        Self {
+            inner: DBWithThreadModeInner { inner: db },
+            cfs: T::new_cf_map_internal(cfs),
+            path: PathBuf::from(path),
+            _outlive: Vec::new(),
+        }
+    }
+
     /// Internal implementation for opening RocksDB.
     fn open_cf_descriptors_internal<P, I>(
         opts: &Options,
